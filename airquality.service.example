@@ -1,0 +1,16 @@
+[Unit]
+Description=Raspberry Pi Air Quality Dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=<PI_USER>
+WorkingDirectory=<PROJECT_DIR>
+Environment=PYTHONUNBUFFERED=1
+ExecStart=<PROJECT_DIR>/.venv/bin/python <PROJECT_DIR>/app.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

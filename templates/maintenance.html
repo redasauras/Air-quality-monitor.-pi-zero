@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111e"><title>Airquality · Calibration & Maintenance</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#07111e; --surface:#101d2d; --surface-raised:#14243a; --surface-soft:#0c1929;
+  --line:rgba(174,198,224,.14); --line-strong:rgba(174,198,224,.24);
+  --muted:#91a6bf; --text:#eff6ff; --teal:#63e1c2; --blue:#84c7ff;
+  --amber:#ffd27d; --red:#ff898e; --shadow:0 18px 48px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% -8%,rgba(34,104,129,.25),transparent 34%),radial-gradient(ellipse at 92% 0%,rgba(45,73,132,.20),transparent 30%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em}
+header{position:sticky;top:0;z-index:20;padding:15px 20px;border-bottom:1px solid var(--line);background:rgba(7,17,30,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.headerrow,main{max-width:1240px;margin:0 auto}
+.headerrow{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.mark{width:44px;height:44px;flex:0 0 44px;border-radius:15px;background:linear-gradient(145deg,#36bea8,#2877a5 72%,#4258a7);display:grid;place-items:center;color:white;font-size:27px;box-shadow:0 8px 24px rgba(42,169,163,.2);border:1px solid rgba(255,255,255,.16)}
+h1{font-size:21px;line-height:1.2;letter-spacing:-.65px;font-weight:750;margin:0;color:#f5f9ff}
+.sub{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+.nav,.navlinks{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.nav a,.navlinks a{display:inline-flex;align-items:center;min-height:38px;padding:8px 12px;border:1px solid transparent;border-radius:11px;color:#aebfd2;text-decoration:none;font-size:12px;font-weight:600;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.nav a:hover,.navlinks a:hover{background:rgba(255,255,255,.06);border-color:var(--line);color:white}
+.nav a.current,.navlinks a.current{background:rgba(63,196,170,.13);border-color:rgba(99,225,194,.3);color:#8df0d4}
+main{padding:26px 20px 48px}
+.intro{margin:0 0 20px;max-width:900px;color:#b4c4d7;font-size:13px;line-height:1.75}
+.pill{display:inline-flex;align-items:center;min-height:37px;padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(16,29,45,.82);color:#c4d4e6;font-size:12px;box-shadow:0 5px 18px rgba(0,0,0,.12)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:8px;box-shadow:0 0 0 4px rgba(99,225,194,.1)}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+button,a.btn,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;gap:7px;padding:8px 13px;border:1px solid var(--line-strong);border-radius:11px;background:linear-gradient(180deg,#1a2c42,#142338);color:#e6f0fb;text-decoration:none;font:inherit;font-size:12px;font-weight:650;line-height:1.2;cursor:pointer;transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+button:hover,a.btn:hover,.btn:hover{transform:translateY(-1px);border-color:rgba(132,199,255,.45);background:#203650;box-shadow:0 7px 18px rgba(0,0,0,.16)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+button.active,button.primary{background:linear-gradient(135deg,#168b7d,#176d79);border-color:rgba(99,225,194,.55);color:#f0fffb}
+.card,.panel{position:relative;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(21,38,59,.96),rgba(13,26,42,.97));box-shadow:var(--shadow)}
+.card{padding:18px}.panel{padding:20px}
+.card:before,.panel:before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(157,221,241,.3),transparent);pointer-events:none}
+.label{color:#9eb3ca;font-size:10px;font-weight:750;letter-spacing:.11em;text-transform:uppercase}
+.value{font-size:clamp(25px,3vw,34px);font-weight:750;line-height:1.1;letter-spacing:-1.1px;margin:11px 0 5px;color:#f4f8ff;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.unit{font-size:11px;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal);margin-top:10px}
+.warn{color:var(--amber)!important}.bad{color:var(--red)!important}
+section{margin-top:16px}
+.sectionhead,.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+h2{font-size:15px;line-height:1.35;letter-spacing:-.2px;margin:0;font-weight:720;color:#eef5ff}
+.small,.muted,.range{color:var(--muted);font-size:11px;line-height:1.55}
+.chartbox{height:260px;position:relative}.chartbox.tall{height:300px}
+.two{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.advice{display:grid;gap:9px}
+.tip,.check,.logitem,.stat,.comparison,.notice{border:1px solid var(--line);background:rgba(7,18,31,.48);border-radius:13px}
+.tip{padding:14px 15px;border-left:3px solid #55708b}
+.tip strong{display:block;font-size:13px;margin-bottom:5px;color:#edf7ff}
+.tip p{margin:0;color:#b6c8da;font-size:12px;line-height:1.65}
+.tip.good{border-left-color:var(--teal)}.tip.caution{border-left-color:var(--amber)}.tip.alert{border-left-color:var(--red)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.summary .card{padding:13px 14px;background:rgba(8,20,34,.55);box-shadow:none;border-radius:13px}
+.summary .range{font-size:11px;color:#d5e2f0;margin-top:7px}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.footer{margin:20px 3px 0;color:#8298b1;font-size:10px;line-height:1.75;max-width:1080px}
+.error{color:#ffaaaa;white-space:pre-wrap}
+/* Reports */
+.reports{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{padding:13px;background:rgba(7,18,31,.55)}
+.stat .label{font-size:10px}.stat .value{font-size:19px;margin-top:6px}
+.detail{font-size:11px;color:#adc0d4;margin-top:5px;line-height:1.6}
+.comparison{margin-top:13px;padding:13px 14px;font-size:12px;line-height:1.9;color:#c8d8e8}
+.actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:15px}
+.notice{margin-top:15px;padding:13px 15px;color:#b5c6d8;font-size:12px;line-height:1.7}
+/* Maintenance */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel.full{grid-column:1/-1}
+.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;color:#c7d7e8;font-size:12px;font-weight:650;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:11px;background:#091727;color:var(--text);font:inherit;font-size:13px;transition:border-color .16s ease,box-shadow .16s ease}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(132,199,255,.7);box-shadow:0 0 0 3px rgba(132,199,255,.1);outline:0}
+.field textarea{min-height:100px;resize:vertical}
+.help{display:block;color:#849bb4;font-size:10px;margin-top:6px;line-height:1.5}
+.message{font-size:12px;color:var(--teal)}
+.checks{display:grid;gap:9px}.check{padding:13px 14px}.check strong{display:block;font-size:12px;color:#eaf3fc}.check p{margin:5px 0 0;color:#afc1d3;font-size:11px;line-height:1.65}
+.log{display:grid;gap:9px}.logitem{padding:12px 14px}.logitem strong{font-size:12px;color:#edf6ff;text-transform:capitalize}.logitem p{font-size:11px;color:#b8c9da;margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}.logitem time{display:block;font-size:10px;color:#8298b1;margin-top:3px}
+@media(max-width:980px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.two{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){header{padding:13px 14px}.headerrow{align-items:flex-start}.nav,.navlinks{width:100%}.nav a,.navlinks a{flex:1;justify-content:center;padding:8px 7px;font-size:11px}main{padding:19px 14px 34px}.reports,.cols{grid-template-columns:1fr}.panel.full{grid-column:auto}.panel{padding:17px}.card{padding:15px}}
+@media(max-width:480px){main{padding:15px 11px 28px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.value{font-size:26px}.chartbox,.chartbox.tall{height:235px}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.fieldgrid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.brand{gap:10px}.mark{width:39px;height:39px;flex-basis:39px;border-radius:13px}h1{font-size:18px}.topline{align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style></head><body>
+<header><div class="headerrow"><div class="brand"><div class="mark">⌁</div><div><h1>Calibration & maintenance</h1><div class="sub">Reference offsets and service log</div></div></div><nav class="nav"><a href="/">Dashboard</a><a href="/reports">Reports</a><a class="current" href="/maintenance">Calibration & maintenance</a></nav></div></header>
+<main>
+<p class="intro">Use this page to record upkeep and apply small correction offsets when you have compared the readings with a suitable reference instrument. These settings do not replace laboratory calibration.</p>
+<div class="cols">
+<section class="panel"><div class="head"><h2>Sensor correction offsets</h2><span class="muted" id="calUpdated">Loading…</span></div>
+<form id="calForm"><div class="fieldgrid">
+<div class="field"><label for="temperature_f_offset">Temperature correction (°F)</label><input type="number" step="0.1" min="-15" max="15" id="temperature_f_offset" value="0"><span class="help">Added to future BME280 temperature readings.</span></div>
+<div class="field"><label for="humidity_offset">Humidity correction (%)</label><input type="number" step="0.1" min="-25" max="25" id="humidity_offset" value="0"><span class="help">Percentage-point adjustment, clamped to 0–100%.</span></div>
+<div class="field"><label for="pressure_inhg_offset">Pressure correction (inHg)</label><input type="number" step="0.01" min="-1" max="1" id="pressure_inhg_offset" value="0"><span class="help">Added to future pressure readings.</span></div>
+<div class="field"><label for="pm25_offset">PM2.5 correction (µg/m³)</label><input type="number" step="0.1" min="-50" max="50" id="pm25_offset" value="0"><span class="help">Added to future PM2.5 readings; result cannot be below zero.</span></div>
+</div><div class="actions"><button type="submit" class="primary">Save correction offsets</button><span class="message" id="calMessage" aria-live="polite"></span></div></form>
+<div class="notice"><strong>Important:</strong> Only enter an offset after comparing the sensor with a reliable reference under similar conditions. These offsets affect newly captured readings only; existing history is not rewritten. An offset is a simple correction, not a certified calibration procedure.</div>
+</section>
+<section class="panel"><div class="head"><h2>Maintenance checklist</h2><span class="muted">Practical checks</span></div><div class="checks">
+<div class="check"><strong>Periodically inspect sensor openings</strong><p>Keep the PMSA003I air inlet and outlet clear. Keep the assembly away from fabric, walls, dust buildup, and anything that blocks airflow.</p></div>
+<div class="check"><strong>Check wiring and power</strong><p>Inspect the I²C connections and power leads for loose plugs, damaged insulation, or unusual heat. Shut the Pi down before changing wiring.</p></div>
+<div class="check"><strong>Keep the sensor dry</strong><p>Avoid condensation, water, cooking steam, and very damp locations. Do not spray cleaner into the sensor or open the module unless its manufacturer instructions specifically call for it.</p></div>
+<div class="check"><strong>Compare readings occasionally</strong><p>Compare against a trusted nearby monitor under similar conditions. Different sensor models and locations can disagree; do not use a single comparison as proof of exact accuracy.</p></div>
+<div class="check"><strong>Review fan / sensor status</strong><p>Watch for sensor errors or readings that become stuck. Check the manufacturer's documentation before attempting any internal cleaning or fan service.</p></div>
+</div></section>
+<section class="panel"><div class="head"><h2>Log maintenance</h2><span class="muted">Saved in the local database</span></div>
+<form id="logForm"><div class="fieldgrid"><div class="field"><label for="category">Task type</label><select id="category"><option value="inspection">Visual inspection</option><option value="cleaning">External cleaning</option><option value="fan_check">Fan / airflow check</option><option value="other">Other</option></select></div><div class="field"><label for="notes">What did you do?</label><textarea id="notes" maxlength="500" required placeholder="Example: Checked inlet for blockage and inspected cable connections."></textarea></div></div><div class="actions"><button type="submit" class="primary">Add log entry</button><span class="message" id="logMessage" aria-live="polite"></span></div></form>
+</section>
+<section class="panel"><div class="head"><h2>Maintenance and calibration history</h2><span class="muted">Most recent 30 entries</span></div><div class="log" id="log"><div class="muted">Loading history…</div></div></section>
+</div>
+<p class="footer">The dashboard is designed for a trusted home network and has no login. Do not expose it directly to the public internet.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);const fields=['temperature_f_offset','humidity_offset','pressure_inhg_offset','pm25_offset'];
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;')}
+function renderLog(items){const box=$('log');box.replaceChildren();if(!items.length){box.textContent='No maintenance entries recorded yet.';return;}for(const item of items){const article=document.createElement('article');article.className='logitem';const title=document.createElement('strong');title.textContent=item.category==='calibration'?'Calibration offsets updated':item.category.replace('_',' ');const time=document.createElement('time');time.textContent=new Date(item.timestamp).toLocaleString();const note=document.createElement('p');note.textContent=item.notes+(item.details?' · '+item.details:'');article.append(title,time,note);box.append(article)}}
+async function load(){try{const r=await fetch('/api/maintenance');if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();for(const k of fields)$(k).value=Number(d.calibration[k]||0);$('calUpdated').textContent=d.calibration.updated_at?'Updated '+new Date(d.calibration.updated_at).toLocaleString():'No calibration changes';renderLog(d.log||[])}catch(e){$('calMessage').textContent='Could not load settings: '+e;$('calMessage').className='message error'}}
+$('calForm').addEventListener('submit',async e=>{e.preventDefault();$('calMessage').textContent='Saving…';try{const payload={};for(const k of fields)payload[k]=Number($(k).value);const r=await fetch('/api/calibration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||r.status);$('calMessage').textContent='Saved. New sensor samples will use these offsets.';load()}catch(err){$('calMessage').textContent='Save failed: '+err;$('calMessage').className='message error'}});
+$('logForm').addEventListener('submit',async e=>{e.preventDefault();$('logMessage').textContent='Saving…';try{const r=await fetch('/api/maintenance/log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:$('category').value,notes:$('notes').value})});const d=await r.json();if(!r.ok)throw new Error(d.error||r.status);$('notes').value='';$('logMessage').textContent='Entry saved.';load()}catch(err){$('logMessage').textContent='Save failed: '+err;$('logMessage').className='message error'}});
+load();
+</script></body></html>

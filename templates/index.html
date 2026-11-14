@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111e">
+<title>Airquality · Indoor Monitor</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#07111e; --surface:#101d2d; --surface-raised:#14243a; --surface-soft:#0c1929;
+  --line:rgba(174,198,224,.14); --line-strong:rgba(174,198,224,.24);
+  --muted:#91a6bf; --text:#eff6ff; --teal:#63e1c2; --blue:#84c7ff;
+  --amber:#ffd27d; --red:#ff898e; --shadow:0 18px 48px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% -8%,rgba(34,104,129,.25),transparent 34%),radial-gradient(ellipse at 92% 0%,rgba(45,73,132,.20),transparent 30%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em}
+header{position:sticky;top:0;z-index:20;padding:15px 20px;border-bottom:1px solid var(--line);background:rgba(7,17,30,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.headerrow,main{max-width:1240px;margin:0 auto}
+.headerrow{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.mark{width:44px;height:44px;flex:0 0 44px;border-radius:15px;background:linear-gradient(145deg,#36bea8,#2877a5 72%,#4258a7);display:grid;place-items:center;color:white;font-size:27px;box-shadow:0 8px 24px rgba(42,169,163,.2);border:1px solid rgba(255,255,255,.16)}
+h1{font-size:21px;line-height:1.2;letter-spacing:-.65px;font-weight:750;margin:0;color:#f5f9ff}
+.sub{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+.nav,.navlinks{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.nav a,.navlinks a{display:inline-flex;align-items:center;min-height:38px;padding:8px 12px;border:1px solid transparent;border-radius:11px;color:#aebfd2;text-decoration:none;font-size:12px;font-weight:600;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.nav a:hover,.navlinks a:hover{background:rgba(255,255,255,.06);border-color:var(--line);color:white}
+.nav a.current,.navlinks a.current{background:rgba(63,196,170,.13);border-color:rgba(99,225,194,.3);color:#8df0d4}
+main{padding:26px 20px 48px}
+.intro{margin:0 0 20px;max-width:900px;color:#b4c4d7;font-size:13px;line-height:1.75}
+.pill{display:inline-flex;align-items:center;min-height:37px;padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(16,29,45,.82);color:#c4d4e6;font-size:12px;box-shadow:0 5px 18px rgba(0,0,0,.12)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:8px;box-shadow:0 0 0 4px rgba(99,225,194,.1)}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.range-panel{margin-top:14px}.range-controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.range-field{min-width:190px;flex:1}.range-field label{display:block;color:#c7d7e8;font-size:11px;font-weight:650;margin:0 0 6px}.range-field input{width:100%;min-height:39px;padding:8px 10px;border:1px solid var(--line-strong);border-radius:10px;background:#091727;color:var(--text);font:inherit;font-size:12px}.range-note{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.6}.trend-switch{display:inline-flex;align-items:center;gap:8px;color:#bdd0e2;font-size:11px;cursor:pointer}.trend-switch input{accent-color:#63e1c2;width:15px;height:15px}.chart-note{margin-top:8px;color:#8298b1;font-size:10px;line-height:1.6}
+button,a.btn,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;gap:7px;padding:8px 13px;border:1px solid var(--line-strong);border-radius:11px;background:linear-gradient(180deg,#1a2c42,#142338);color:#e6f0fb;text-decoration:none;font:inherit;font-size:12px;font-weight:650;line-height:1.2;cursor:pointer;transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+button:hover,a.btn:hover,.btn:hover{transform:translateY(-1px);border-color:rgba(132,199,255,.45);background:#203650;box-shadow:0 7px 18px rgba(0,0,0,.16)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+button.active,button.primary{background:linear-gradient(135deg,#168b7d,#176d79);border-color:rgba(99,225,194,.55);color:#f0fffb}
+.card,.panel{position:relative;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(21,38,59,.96),rgba(13,26,42,.97));box-shadow:var(--shadow)}
+.card{padding:18px}.panel{padding:20px}
+.card:before,.panel:before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(157,221,241,.3),transparent);pointer-events:none}
+.label{color:#9eb3ca;font-size:10px;font-weight:750;letter-spacing:.11em;text-transform:uppercase}
+.value{font-size:clamp(25px,3vw,34px);font-weight:750;line-height:1.1;letter-spacing:-1.1px;margin:11px 0 5px;color:#f4f8ff;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.unit{font-size:11px;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal);margin-top:10px}
+.warn{color:var(--amber)!important}.bad{color:var(--red)!important}
+section{margin-top:16px}
+.sectionhead,.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+h2{font-size:15px;line-height:1.35;letter-spacing:-.2px;margin:0;font-weight:720;color:#eef5ff}
+.small,.muted,.range{color:var(--muted);font-size:11px;line-height:1.55}
+.chartbox{height:280px;position:relative}.chartbox.tall{height:320px}
+.two{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.advice{display:grid;gap:9px}
+.tip,.check,.logitem,.stat,.comparison,.notice{border:1px solid var(--line);background:rgba(7,18,31,.48);border-radius:13px}
+.tip{padding:14px 15px;border-left:3px solid #55708b}
+.tip strong{display:block;font-size:13px;margin-bottom:5px;color:#edf7ff}
+.tip p{margin:0;color:#b6c8da;font-size:12px;line-height:1.65}
+.tip.good{border-left-color:var(--teal)}.tip.caution{border-left-color:var(--amber)}.tip.alert{border-left-color:var(--red)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.summary .card{padding:13px 14px;background:rgba(8,20,34,.55);box-shadow:none;border-radius:13px}
+.summary .range{font-size:11px;color:#d5e2f0;margin-top:7px}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.footer{margin:20px 3px 0;color:#8298b1;font-size:10px;line-height:1.75;max-width:1080px}
+.error{color:#ffaaaa;white-space:pre-wrap}
+/* Reports */
+.reports{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{padding:13px;background:rgba(7,18,31,.55)}
+.stat .label{font-size:10px}.stat .value{font-size:19px;margin-top:6px}
+.detail{font-size:11px;color:#adc0d4;margin-top:5px;line-height:1.6}
+.comparison{margin-top:13px;padding:13px 14px;font-size:12px;line-height:1.9;color:#c8d8e8}
+.actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:15px}
+.notice{margin-top:15px;padding:13px 15px;color:#b5c6d8;font-size:12px;line-height:1.7}
+/* Maintenance */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel.full{grid-column:1/-1}
+.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;color:#c7d7e8;font-size:12px;font-weight:650;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:11px;background:#091727;color:var(--text);font:inherit;font-size:13px;transition:border-color .16s ease,box-shadow .16s ease}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(132,199,255,.7);box-shadow:0 0 0 3px rgba(132,199,255,.1);outline:0}
+.field textarea{min-height:100px;resize:vertical}
+.help{display:block;color:#849bb4;font-size:10px;margin-top:6px;line-height:1.5}
+.message{font-size:12px;color:var(--teal)}
+.checks{display:grid;gap:9px}.check{padding:13px 14px}.check strong{display:block;font-size:12px;color:#eaf3fc}.check p{margin:5px 0 0;color:#afc1d3;font-size:11px;line-height:1.65}
+.log{display:grid;gap:9px}.logitem{padding:12px 14px}.logitem strong{font-size:12px;color:#edf6ff;text-transform:capitalize}.logitem p{font-size:11px;color:#b8c9da;margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}.logitem time{display:block;font-size:10px;color:#8298b1;margin-top:3px}
+@media(max-width:980px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.two{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){header{padding:13px 14px}.headerrow{align-items:flex-start}.nav,.navlinks{width:100%}.nav a,.navlinks a{flex:1;justify-content:center;padding:8px 7px;font-size:11px}main{padding:19px 14px 34px}.reports,.cols{grid-template-columns:1fr}.panel.full{grid-column:auto}.panel{padding:17px}.card{padding:15px}}
+@media(max-width:480px){main{padding:15px 11px 28px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.value{font-size:26px}.chartbox,.chartbox.tall{height:250px}.range-field{min-width:100%}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.fieldgrid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.brand{gap:10px}.mark{width:39px;height:39px;flex-basis:39px;border-radius:13px}h1{font-size:18px}.topline{align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style></head>
+<body>
+<header><div class="headerrow"><div class="brand"><div class="mark">⌁</div><div><h1>Airquality</h1><div class="sub">Indoor environment monitor · Raspberry Pi Zero W</div></div></div><nav class="navlinks"><a class="current" href="/">Dashboard</a><a href="/reports">Reports</a><a href="/maintenance">Calibration & maintenance</a></nav></div></header>
+<main>
+<div class="topline"><div class="pill"><span class="dot" id="liveDot"></span><span id="liveStatus">Connecting to sensors…</span> <span id="lastRead"></span></div>
+<div class="toolbar" id="periods"><button data-period="1h">1H</button><button data-period="6h">6H</button><button data-period="24h" class="active">24H</button><button data-period="7d">7D</button><button data-period="30d">30D</button><a class="btn" id="csv" href="/download.csv?period=24h">Export CSV</a></div></div>
+<section class="card range-panel"><div class="sectionhead"><div><h2>Custom history range</h2><span class="small" id="rangeCaption">Showing the last 24 hours</span></div><label class="trend-switch"><input id="showTrend" type="checkbox" checked> Show rolling trend lines</label></div><div class="range-controls"><div class="range-field"><label for="startDate">Start · your local time</label><input id="startDate" type="datetime-local"></div><div class="range-field"><label for="endDate">End · your local time</label><input id="endDate" type="datetime-local"></div><button id="applyCustom" class="primary">Apply custom range</button><button id="resetRange">Reset</button></div><div class="range-note" id="rangeMessage">Solid lines show actual saved readings. Dashed lines show rolling averages to make longer-term direction easier to see. The trend overlay does not replace or edit raw data.</div></section>
+<section class="card"><div class="sectionhead"><h2>Historical trend alerts</h2><span class="small">Recent 1-hour readings compared with history</span></div><div class="advice" id="alerts"><div class="tip">Checking historical trends…</div></div><div class="small" id="alertHistory" style="margin-top:10px"></div></section>
+<div class="grid">
+<div class="card"><div class="label">PM2.5 · FINE PARTICLES</div><div class="value" id="pm25">--</div><div class="unit">µg/m³</div><div id="aqi" class="status">Waiting for data</div></div>
+<div class="card"><div class="label">PM1.0</div><div class="value" id="pm1">--</div><div class="unit">µg/m³</div></div>
+<div class="card"><div class="label">PM10</div><div class="value" id="pm10">--</div><div class="unit">µg/m³</div></div>
+<div class="card"><div class="label">TEMPERATURE</div><div class="value" id="temperature">--</div><div class="unit">°F</div></div>
+<div class="card"><div class="label">RELATIVE HUMIDITY</div><div class="value" id="humidity">--</div><div class="unit">%</div></div>
+<div class="card"><div class="label">BAROMETRIC PRESSURE</div><div class="value" id="pressure">--</div><div class="unit">inHg</div></div>
+</div>
+<div class="two">
+<section class="card"><div class="sectionhead"><h2>Particle levels</h2><span class="small" id="count">Loading history…</span></div><div class="chartbox tall"><canvas id="pmChart"></canvas></div><div class="chart-note">Auto-scaled vertical axis for clearer changes. Hover or tap a point to inspect its actual recorded value.</div></section>
+<section class="card"><div class="sectionhead"><h2>Indoor comfort</h2><span class="small">Separate temperature and humidity scales</span></div><div class="chartbox tall"><canvas id="climateChart"></canvas></div><div class="chart-note">Temperature uses the left axis (°F); humidity uses the right axis (%). Each scale is independently auto-scaled.</div></section>
+</div>
+<section class="card"><div class="sectionhead"><h2>Room guidance</h2><span class="small">Rule-based suggestions from indoor readings</span></div><div class="advice" id="advice"><div class="tip">Waiting for sensor readings…</div></div></section>
+<section class="card"><div class="sectionhead"><h2>Selected period summary</h2><span class="small">Min · average · max</span></div><div class="summary" id="summary"></div></section>
+<section class="card"><div class="sectionhead"><h2>System status</h2><span class="small">Sensor and data logging</span></div><div id="sensorstatus">Connecting…</div><div class="small" id="updated"></div></section>
+<p class="footer">Graph lines show actual saved samples; optional dashed overlays are rolling averages calculated for viewing only. Long-range charts may sample selected stored points to stay responsive, but summaries and CSV exports use all readings in the selected time range. No historic database values are rewritten. US customary display units: °F and inHg. Particle concentrations remain in µg/m³, the standard unit. PM2.5 AQI is an approximate estimate, not a certified regulatory measurement. Advice is based only on indoor sensors: the device cannot measure outdoor temperature, outdoor pollution, CO₂, VOCs, or actual ventilation. Check outdoor conditions before opening or closing windows. Keep the sensor away from direct sunlight, vents, cooking steam, and dusty surfaces for representative readings.</p>
+</main>
+<script>
+let period='24h',customRange=null,pmChart,climateChart,trendEnabled=true;
+const $=id=>document.getElementById(id);
+const fmt=(v,n=1)=>v===null||v===undefined||!Number.isFinite(Number(v))?'--':Number(v).toFixed(n);
+function localInputValue(date){const pad=n=>String(n).padStart(2,'0');return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`}
+function initializeRangeInputs(){const end=new Date(),start=new Date(end.getTime()-6*3600*1000);$('startDate').value=localInputValue(start);$('endDate').value=localInputValue(end)}
+function queryParams(){const p=new URLSearchParams();if(customRange){p.set('start',customRange.start);p.set('end',customRange.end)}else p.set('period',period);return p.toString()}
+function durationSeconds(rows){if(rows.length<2)return period==='1h'?3600:period==='6h'?21600:period==='7d'?604800:period==='30d'?2592000:86400;return Math.max(1,(Date.parse(rows[rows.length-1].timestamp)-Date.parse(rows[0].timestamp))/1000)}
+function localLabels(rows,span){return rows.map(r=>new Date(r.timestamp).toLocaleString([],span<=86400?{hour:'numeric',minute:'2-digit'}:{month:'numeric',day:'numeric',hour:'numeric'}))}
+function trendWindowSeconds(span){if(!customRange)return ({'1h':300,'6h':900,'24h':3600,'7d':21600,'30d':86400}[period]||3600);return Math.max(300,span/100)}
+function rollingAverage(rows,key,windowSeconds){let left=0,sum=0,count=0;const result=[];const times=rows.map(r=>Date.parse(r.timestamp));for(let i=0;i<rows.length;i++){const v=Number(rows[i][key]);if(rows[i][key]!==null&&rows[i][key]!==undefined&&Number.isFinite(v)){sum+=v;count++}const cutoff=times[i]-windowSeconds*1000;while(left<=i&&times[left]<cutoff){const old=Number(rows[left][key]);if(rows[left][key]!==null&&rows[left][key]!==undefined&&Number.isFinite(old)){sum-=old;count--}left++}result.push(count?sum/count:null)}return result}
+function windowLabel(seconds){if(seconds<3600)return `${Math.round(seconds/60)}m`;if(seconds<86400)return `${Math.round(seconds/3600)}h`;return `${(seconds/86400).toFixed(1)}d`}
+function baseChartOptions(){return {responsive:true,maintainAspectRatio:false,animation:false,normalized:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:'#b8cadd',usePointStyle:true,boxWidth:8,padding:15,font:{size:11,weight:'600'}}},tooltip:{backgroundColor:'#091421',borderColor:'#4b6682',borderWidth:1,titleColor:'#fff',bodyColor:'#dce8f6',padding:11,displayColors:true}},scales:{x:{ticks:{color:'#a3b8ce',maxTicksLimit:7,maxRotation:0,font:{size:10}},grid:{display:false},title:{display:true,text:'Time · local',color:'#8298b1',font:{size:10}}}}}}
+function makeChart(id,labels,datasets,scales){const options=baseChartOptions();options.scales={...options.scales,...scales};return new Chart($(id).getContext('2d'),{type:'line',data:{labels,datasets},options})}
+function chartSeries(rows,key,color,label,windowSeconds,axis='y'){const raw=rows.map(r=>r[key]);const small=rows.length<140;const trend=rollingAverage(rows,key,windowSeconds);return [{label, data:raw, yAxisID:axis, borderColor:color,backgroundColor:color,borderWidth:1.9,tension:0,pointRadius:small?1.7:0,pointHoverRadius:4,pointHitRadius:10,spanGaps:false,fill:false,order:2},{label:`${label} trend · ${windowLabel(windowSeconds)} avg`,data:trend,yAxisID:axis,borderColor:color,borderWidth:2.5,borderDash:[7,5],tension:.2,pointRadius:0,pointHitRadius:8,spanGaps:true,fill:false,hidden:!trendEnabled,order:1}]}
+function recommendations(d){
+ const a=[];const t=d.temperature_f, h=d.humidity, p=d.pm25, q=d.aqi;
+ if(p!=null){if(p>35.4)a.push(['alert','Particle levels elevated','PM2.5 is high. Avoid adding indoor particles: pause candles, smoking, and dusty activities. If outdoor air is cleaner, ventilate briefly; otherwise keep windows closed and use a properly sized HEPA air cleaner.']);else if(p>12)a.push(['caution','Reduce particle sources','PM2.5 is above the lowest range. Check cooking, candles, dust, and vacuuming. Use a kitchen exhaust fan that vents outdoors when cooking.']);else a.push(['good','Particle levels look low','PM2.5 is currently in a relatively low range. Continue normal cleaning and ventilation practices.']);}
+ if(h!=null){if(h>60)a.push(['caution','Humidity is high','Indoor humidity is above the commonly recommended 30–50% range. Run bathroom/kitchen exhaust fans, address moisture sources, and consider a dehumidifier. Watch for condensation.']);else if(h<30)a.push(['caution','Humidity is low','Air is dry. Consider a clean humidifier if needed; keep it maintained and avoid raising humidity above 50%.']);else a.push(['good','Humidity is in a typical comfort range','Relative humidity is within roughly 30–50%. Continue monitoring for condensation or damp spots.']);}
+ if(t!=null){if(t<68)a.push(['caution','Room is cool','Indoor temperature is below 68°F. If the window is open and outdoor air is colder, consider closing it to retain heat. The sensor cannot tell outdoor temperature, so check outside conditions first.']);else if(t>78)a.push(['caution','Room is warm','Indoor temperature is above 78°F. If outdoor air is cooler and its air quality is good, opening a window may help; otherwise use safe cooling or ventilation.']);else a.push(['good','Temperature is in a typical comfort range','Indoor temperature is between 68°F and 78°F. Adjust to personal comfort and local conditions.']);}
+ if(q!=null&&q>100)a.push(['alert','AQI caution','The estimated PM2.5 AQI is above 100. Reduce exposure and check your local official air-quality forecast. This low-cost sensor is not a certified monitor.']);
+ return a.length?a.map(x=>`<div class="tip ${x[0]}"><strong>${x[1]}</strong><p>${x[2]}</p></div>`).join(''):'<div class="tip">Waiting for valid sensor readings…</div>';
+}
+async function refreshCurrent(){
+ try{const response=await fetch('/api/current',{cache:'no-store'});if(!response.ok)throw new Error(`HTTP ${response.status}`);const d=await response.json();
+  for(const k of ['pm1','pm25','pm10','humidity'])$(k).textContent=fmt(d[k]);$('temperature').textContent=fmt(d.temperature_f);$('pressure').textContent=fmt(d.pressure_inhg,2);$('aqi').textContent=d.aqi==null?'AQI unavailable':`AQI ${d.aqi} · ${d.aqi_label}`;$('aqi').className='status '+(d.aqi>100?'bad':d.aqi>50?'warn':'');$('liveStatus').textContent=d.ok?'Live · sensors responding':'Sensor issue / incomplete reading';$('liveDot').style.background=d.ok?'#55d6be':'#ff8585';$('sensorstatus').innerHTML=d.ok?'<span class="status">PMSA003I and BME280 responding</span>':'<span class="error">Sensor issue or incomplete reading</span>';if(d.errors?.length)$('sensorstatus').innerHTML+='<div class="error">'+d.errors.map(x=>x.replaceAll('&','&amp;').replaceAll('<','&lt;')).join('<br>')+'</div>';$('lastRead').textContent=d.timestamp?' · '+new Date(d.timestamp).toLocaleTimeString():'';$('updated').textContent='Last sensor read: '+(d.timestamp?new Date(d.timestamp).toLocaleString():'never');$('advice').innerHTML=recommendations(d);
+ }catch(e){$('liveStatus').textContent='Server connection error';$('sensorstatus').textContent='Cannot contact server: '+e}
+}
+async function refreshAlerts(){
+ try{const response=await fetch('/api/alerts',{cache:'no-store'});if(!response.ok)throw new Error(`HTTP ${response.status}`);const data=await response.json();const active=data.active||[];if(!active.length){$('alerts').innerHTML='<div class="tip good"><strong>No active trend alerts</strong><p>No current historical trend conditions are being flagged. Alerts need enough saved samples to compare a recent hour with the previous day.</p></div>';}else{$('alerts').innerHTML=active.map(a=>`<div class="tip ${a.severity==='alert'?'alert':'caution'}"><strong>${a.title}</strong><p>${a.message}</p><div class="small">First seen: ${new Date(a.first_seen).toLocaleString()} · Last updated: ${new Date(a.last_seen).toLocaleString()}</div></div>`).join('');}const past=(data.recent||[]).filter(a=>a.resolved_at).slice(0,5);$('alertHistory').textContent=past.length?'Recently resolved: '+past.map(a=>`${a.title} (${new Date(a.resolved_at).toLocaleString()})`).join(' · '):'No resolved alert history yet.';
+ }catch(e){$('alerts').textContent='Alert history unavailable: '+e}
+}
+function setRangeCaption(rows,d,span){const labelsByPeriod={'1h':'Last hour','6h':'Last 6 hours','24h':'Last 24 hours','7d':'Last 7 days','30d':'Last 30 days'};const label=customRange?'Custom range':(labelsByPeriod[period]||'Selected range');if(customRange){$('rangeCaption').textContent=`Custom: ${new Date(customRange.start).toLocaleString()} – ${new Date(customRange.end).toLocaleString()}`}else{$('rangeCaption').textContent=label+' · local time'}const from=rows.length?new Date(rows[0].timestamp).toLocaleString():'no readings';const to=rows.length?new Date(rows[rows.length-1].timestamp).toLocaleString():'no readings';$('rangeMessage').textContent=`${d.count.toLocaleString()} saved readings from ${from} to ${to}. Solid lines are actual saved samples; dashed lines are rolling averages calculated for viewing only. Summary statistics and CSV exports use every saved reading in the selected range.`;}
+async function refreshHistory(){
+ try{const params=queryParams();const response=await fetch('/api/history?'+params,{cache:'no-store'});if(!response.ok){const problem=await response.json().catch(()=>({}));throw new Error(problem.error||`History request failed (${response.status})`)}const d=await response.json(),rows=d.readings||[],span=customRange?(Date.parse(customRange.end)-Date.parse(customRange.start))/1000:periodSecondsClient(),labels=localLabels(rows,span),windowSecs=trendWindowSeconds(span);$('count').textContent=`${d.count.toLocaleString()} saved · ${d.plotted_count.toLocaleString()} plotted`;setRangeCaption(rows,d,span);
+  const psets=[...chartSeries(rows,'pm1','#71baff','PM1.0',windowSecs),...chartSeries(rows,'pm25','#55d6be','PM2.5',windowSecs),...chartSeries(rows,'pm10','#f2c46d','PM10',windowSecs)];
+  const csets=[...chartSeries(rows,'temperature','#ff9387','Temperature °F',windowSecs,'temp'),...chartSeries(rows,'humidity','#71baff','Humidity %',windowSecs,'humidity')];
+  const particleScales={y:{type:'linear',beginAtZero:false,grace:'10%',ticks:{color:'#a3b8ce',font:{size:10}},grid:{color:'rgba(145,166,191,.16)'},title:{display:true,text:'Concentration · µg/m³',color:'#91a6bf',font:{size:10}}}};
+  const climateScales={temp:{type:'linear',position:'left',beginAtZero:false,grace:'10%',ticks:{color:'#ffaaa1',font:{size:10}},grid:{color:'rgba(145,166,191,.14)'},title:{display:true,text:'Temperature · °F',color:'#ffaaa1',font:{size:10}}},humidity:{type:'linear',position:'right',beginAtZero:false,grace:'10%',ticks:{color:'#8dcaff',font:{size:10}},grid:{drawOnChartArea:false},title:{display:true,text:'Humidity · %',color:'#8dcaff',font:{size:10}}}};
+  if(!pmChart)pmChart=makeChart('pmChart',labels,psets,particleScales);else{pmChart.data.labels=labels;pmChart.data.datasets=psets;pmChart.update('none')}
+  if(!climateChart)climateChart=makeChart('climateChart',labels,csets,climateScales);else{climateChart.data.labels=labels;climateChart.data.datasets=csets;climateChart.update('none')}
+  const exportParams=queryParams();$('csv').href='/download.csv?'+exportParams;
+  const summaryParams=customRange?params:new URLSearchParams({start:d.start,end:d.end}).toString();const sumResponse=await fetch('/api/summary?'+summaryParams,{cache:'no-store'});if(!sumResponse.ok)throw new Error('Summary request failed');const summary=await sumResponse.json();const names={pm25:'PM2.5',temperature:'Temperature',humidity:'Humidity',pressure:'Pressure'};const units={pm25:'µg/m³',temperature:'°F',humidity:'%',pressure:'inHg'};$('summary').innerHTML=Object.entries(summary).map(([k,v])=>`<div class="card"><div class="label">${names[k]}</div><div class="range">Min ${fmt(v.min)} · Avg ${fmt(v.avg)} · Max ${fmt(v.max)} ${units[k]}</div></div>`).join('');
+ }catch(e){$('count').textContent='History unavailable';$('rangeMessage').textContent=e.message}
+}
+function periodSecondsClient(){return ({'1h':3600,'6h':21600,'24h':86400,'7d':604800,'30d':2592000}[period]||86400)}
+function activatePreset(nextPeriod){period=nextPeriod;customRange=null;document.querySelectorAll('[data-period]').forEach(b=>b.classList.toggle('active',b.dataset.period===period));refreshHistory()}
+document.querySelectorAll('[data-period]').forEach(b=>b.addEventListener('click',()=>activatePreset(b.dataset.period)));
+$('applyCustom').addEventListener('click',()=>{const startValue=$('startDate').value,endValue=$('endDate').value;if(!startValue||!endValue){$('rangeMessage').textContent='Select both a start and end time.';return}const start=new Date(startValue),end=new Date(endValue);if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start){$('rangeMessage').textContent='The end time must be later than the start time.';return}if(end-start>366*24*3600*1000){$('rangeMessage').textContent='Custom ranges are limited to 366 days.';return}customRange={start:start.toISOString(),end:end.toISOString()};document.querySelectorAll('[data-period]').forEach(b=>b.classList.remove('active'));refreshHistory()});
+$('resetRange').addEventListener('click',()=>activatePreset('24h'));
+$('showTrend').addEventListener('change',event=>{trendEnabled=event.target.checked;[pmChart,climateChart].forEach(chart=>{if(chart){chart.data.datasets.forEach(ds=>{if(ds.label.includes('trend ·'))ds.hidden=!trendEnabled});chart.update('none')}})});
+initializeRangeInputs();refreshCurrent();refreshHistory();refreshAlerts();setInterval(refreshCurrent,5000);setInterval(refreshHistory,30000);setInterval(refreshAlerts,30000);
+</script></body></html>
