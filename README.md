@@ -13,10 +13,11 @@ A local web dashboard for indoor air quality readings from a BME280 environmenta
 ## Hardware
 
 - Raspberry Pi Zero W and power supply with Raspberry Pi OS (you can also use pi os lite) (32-bit recommended for compatibility)
+- Micro sd card for pi zero (16-32gb is plenty)
 - BME280 breakout [https://www.adafruit.com/product/2652](url)
 - PMSA003I particulate sensor breakout [https://www.adafruit.com/product/4632](url)
-- steam qt breakout for pi zeros [https://www.adafruit.com/product/6365](url) (optional but make wireing solderles and simpler)
-- stema qt cables i used 1x 100m and 1x50mm [https://www.adafruit.com/product/4210](url) (optional but make wireing solderles and simpler)
+- stema qt breakout for pi zeros [https://www.adafruit.com/product/6365](url) (optional but make wiring solderless and simpler)
+- stema qt cables i used 1x 100mm and 1x 50mm [https://www.adafruit.com/product/4210](url) (optional but make wiring solderless and simpler)
 - Jumper wires or the stema qt parts above shown above
 - 3d printed enclosure found in the folder named (3d files) the folder includes both f3d for making you own chages and 3mf for printing (printed in petg)
 - double sided tape for keeping the lid on the enclosure [https://www.amazon.com/dp/B0FMNHWPR3/ref=sspa_dk_detail_0?pd_rd_i=B0FMNHWPR3&pd_rd_w=PkzSo&content-id=amzn1.sym.17345c9b-ef8c-4a79-bcd9-8894b1e1e0ea&pf_rd_p=17345c9b-ef8c-4a79-bcd9-8894b1e1e0ea&pf_rd_r=WQ52FTRPFAKVJBG5EG4M&pd_rd_wg=m5ORJ&pd_rd_r=c9344147-aac9-44c2-a19a-ce61da58d97a&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWw&th=1](url) (anything simmlar will work)
@@ -24,6 +25,13 @@ A local web dashboard for indoor air quality readings from a BME280 environmenta
 - a few short m3 hex screws for mounting the components in the enclosure  
 
 The Raspberry Pi Zero 2 W may also work, but check physical fit with the enclosure. Check each breakout board's voltage requirements. Connect both sensors to 3.3V-compatible power, ground, SDA (GPIO2, physical pin 3), and SCL (GPIO3, physical pin 5). On the Pi, physical pin 1 is 3.3V and pin 6 is ground. Confirm sensor-specific wiring and pin labels against their manufacturer documentation before powering the circuit. Both devices use I2C; verify their addresses do not conflict.
+
+## tools
+
+- hex keys
+- soldering iron (optional if using the stema qt route)
+- 3d printer (you could use a 3d printing service if you dont have one, like pcbway)
+- computer (for flashing the pi zero and uploading the code)
 
 ## Install on Raspberry Pi OS
 
